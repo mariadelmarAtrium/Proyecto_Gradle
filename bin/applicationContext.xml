@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+	<context:annotation-config />
+
+	<context:component-scan base-package="com.grupoatrium" />
+
+	<!-- Cargamos el archivo de propiedades ubicado en la carpeta config -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/data-source.properties</value>
+			</list>
+		</property>
+
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+	<!-- Inyectamos las propiedades del bean con los datos del archivo de propiedades -->
+	<bean id="connectionMgr" class="com.grupoatrium.persistencia.impl.ConnectionMgr">
+		<property name="driver" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="usuario" value="${usuario}" />
+		<property name="password" value="${pw}" />
+	</bean>
+
+
+
+	<!-- Bean abstracto sin clase asociada que contiene la propiedad connMgr 
+		y referencia al bean id="connMgr" -->
+	<bean id="abstractDAO" abstract="true">
+		<property name="connMgr" ref="connectionMgr" />
+	</bean>
+
+
+	<!-- Creamos dos been que heredan del bean abstracto -->
+
+	<bean id="librosDAO" class="com.grupoatrium.persistencia.impl.LibrosDAO"
+		parent="abstractDAO" />
+
+	<bean id="editorialesDAO" class="com.grupoatrium.persistencia.impl.EditorialesDAO"
+		parent="abstractDAO" />
+
+
+</beans>
+
+
